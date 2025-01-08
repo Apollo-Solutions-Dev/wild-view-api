@@ -25,10 +25,13 @@ export class AppController {
     return { files };
   }
 
-  @Post('get-json-upload-url')
-  async getJsonUploadUrl(@Body() body: { fileName: string }) {
-    const uploadUrl = await this.s3Service.getJsonUploadUrl(body.fileName);
-    return { uploadUrl };
+  @Post('upload')
+  async uploadFile(@Body() jsonData: any) {
+	const result = await this.s3Service.uploadFile(
+	  Buffer.from(JSON.stringify(jsonData)),
+	  'v1.5/image_points'
+	);
+	return { status: 'success', data: result };
   }
 
   @Post('get-video-upload-url')
