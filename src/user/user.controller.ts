@@ -12,7 +12,6 @@ import { AuthGuard } from '@nestjs/passport';
 import { User } from '@prisma/client';
 import { AuthService } from 'src/auth/auth.service';
 
-@UseGuards(AuthGuard('jwt'))
 @Controller('user')
 export class UserController {
   constructor(
