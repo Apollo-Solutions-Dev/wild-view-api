@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model FabricError {
+  id            Int      @id @default(autoincrement())
+  timestamp     DateTime
+  machine       String
+  errorClass    String
+  fullImageURL  String
+  shift         String
+  errorImageURL String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  obId          String
+
+  ob Ob? @relation(fields: [obId], references: [id])
+
+  @@index([obId])
+  @@index([id])
+}
+
+model User {
+  id            Int            @id @default(autoincrement())
+  username      String?
+  email         String         @unique
+  password      String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  obs           Ob[]
+  refreshTokens RefreshToken[]
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Ob {
+  id           String        @id @unique
+  obPieces     Json          @default("[]")
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  fabricErrors FabricError[]
+  User         User?         @relation(fields: [userId], references: [id])
+  userId       Int?
+
+  @@index([userId])
+  @@index([id])
+}
