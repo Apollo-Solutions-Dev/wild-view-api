@@ -31,7 +31,6 @@ export class S3Service {
   }
 
   async uploadFile(file: Buffer, folderName: string) {
-	console.log(process.env.AWS_BUCKET_NAME)
     const params = {
       Bucket: process.env.AWS_BUCKET_NAME,
       Key: `${folderName}/${Date.now()}`,
