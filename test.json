@@ -1,0 +1,21 @@
+{
+	"imagePoints": [
+	  {
+		"id": 1,
+		"x": 100,
+		"y": 200,
+		"label": "point1"
+	  },
+	  {
+		"id": 2,
+		"x": 300,
+		"y": 400,
+		"label": "point2"
+	  }
+	],
+	"timestamp": "2025-01-08T12:00:00Z",
+	"metadata": {
+	  "version": "1.0",
+	  "source": "wildview"
+	}
+  }

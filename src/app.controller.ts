@@ -21,14 +21,15 @@ export class AppController {
 
   @Get('list-files/:folder(*)')
   async listFiles(@Param('folder') folder: string) {
-	const files = await this.s3Service.listFiles(folder);
-	return { files };
+    const files = await this.s3Service.listFiles(folder);
+    return { files };
   }
-  
-  
 
-  // listar os titulos dos videos e os arquivos de todas as imagens desse mesmo video
-
+  @Post('get-json-upload-url')
+  async getJsonUploadUrl(@Body() body: { fileName: string }) {
+    const uploadUrl = await this.s3Service.getJsonUploadUrl(body.fileName);
+    return { uploadUrl };
+  }
 
   @Post('get-video-upload-url')
   async getVideoUploadUrl(@Body() body: { fileName: string }) {

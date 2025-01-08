@@ -59,6 +59,16 @@ export class S3Service {
   
 	return files;
   }
+
+  async getJsonUploadUrl(fileName: string) {
+	const command = new PutObjectCommand({
+	  Bucket: process.env.AWS_BUCKET_NAME,
+	  Key: `v1.5/image_points/${fileName}`,
+	  ContentType: 'application/json'
+	});
+	
+	return await getSignedUrl(this.s3Client, command, { expiresIn: 3600 });
+  }
 }
 
 
