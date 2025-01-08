@@ -30,13 +30,35 @@ export class S3Service {
     return await getSignedUrl(this.s3Client, command, { expiresIn: 3600 });
   }
 
-  async uploadFile(file: Buffer, folderName: string) {
-    const params = {
+  async getVideoUploadUrl(fileName: string) {
+    const command = new PutObjectCommand({
       Bucket: process.env.AWS_BUCKET_NAME,
-      Key: `${folderName}/${Date.now()}`,
-      Body: file,
-    };
+      Key: `v1.5/draw_frame/${fileName}`,
+      ContentType: 'video/*'
+    });
+    
+    return await getSignedUrl(this.s3Client, command, { expiresIn: 3600 });
+  }
 
-    return await this.s3Client.send(new PutObjectCommand(params));
+  async listFiles(prefix: string) {
+	const command = new ListObjectsV2Command({
+	  Bucket: process.env.AWS_BUCKET_NAME,
+	  Prefix: prefix
+	});
+  
+	const response = await this.s3Client.send(command);
+	
+	const files = await Promise.all(
+	  response.Contents?.map(async (file) => ({
+		key: file.Key,
+		lastModified: file.LastModified,
+		size: file.Size,
+		url: await this.getSignedUrl(file.Key)
+	  })) || []
+	);
+  
+	return files;
   }
 }
+
+

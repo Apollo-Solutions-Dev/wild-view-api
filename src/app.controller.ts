@@ -12,7 +12,6 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { PrismaService } from './prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 
-
 @Controller('api')
 export class AppController {
   constructor(
@@ -20,35 +19,20 @@ export class AppController {
     private prisma: PrismaService,
   ) {}
 
-  @Get('get-file/:key(*)')
-  async getFileFromS3(@Param('key') key: string) {
-    const signedUrl = await this.s3Service.getSignedUrl(key);
-    return { url: signedUrl };
+  @Get('list-files/:folder(*)')
+  async listFiles(@Param('folder') folder: string) {
+	const files = await this.s3Service.listFiles(folder);
+	return { files };
   }
+  
+  
 
-  @Post('upload')
-  @UseInterceptors(FileInterceptor('file'))
-  async uploadFile(@UploadedFile() file: any) {
-    const result = await this.s3Service.uploadFile(
-      file.buffer,
-      'v1.5/draw_frame',
-    );
-    return { status: 'success', data: result };
-  }
+  // listar os titulos dos videos e os arquivos de todas as imagens desse mesmo video
 
-  @Get('test-db')
-  async testDB() {
-	const hashedPassword = await bcrypt.hash('test123', 10);
-	
-	const user = await this.prisma.user.update({
-	  where: {
-		email: 'test@example.com'
-	  },
-	  data: {
-		password: hashedPassword
-	  }
-	});
-	
-	return user;
+
+  @Post('get-video-upload-url')
+  async getVideoUploadUrl(@Body() body: { fileName: string }) {
+    const uploadUrl = await this.s3Service.getVideoUploadUrl(body.fileName);
+    return { uploadUrl };
   }
 }

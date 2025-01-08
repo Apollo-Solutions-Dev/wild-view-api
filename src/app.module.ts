@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { S3Module } from './s3/s3.module';
 import { S3Service } from './s3/s3.service';
 import { PrismaService } from './prisma/prisma.service';
 import { AuthModule } from './auth/auth.module';
+import { PrismaModule } from './prisma/prisma.module';
 
 
 @Module({
@@ -15,6 +15,7 @@ import { AuthModule } from './auth/auth.module';
     }),
     S3Module,
 	AuthModule,
+	PrismaModule,
   ],
   controllers: [AppController],
   providers: [S3Service, PrismaService],
