@@ -9,11 +9,16 @@ import {
 } from '@nestjs/common';
 import { S3Service } from './s3/s3.service';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { PrismaService } from './prisma/prisma.service';
+import * as bcrypt from 'bcrypt';
 
 
 @Controller('api')
 export class AppController {
-  constructor(private readonly s3Service: S3Service) {}
+  constructor(
+    private readonly s3Service: S3Service,
+    private prisma: PrismaService,
+  ) {}
 
   @Get('get-file/:key(*)')
   async getFileFromS3(@Param('key') key: string) {
@@ -30,5 +35,20 @@ export class AppController {
     );
     return { status: 'success', data: result };
   }
-}
 
+  @Get('test-db')
+  async testDB() {
+	const hashedPassword = await bcrypt.hash('test123', 10);
+	
+	const user = await this.prisma.user.update({
+	  where: {
+		email: 'test@example.com'
+	  },
+	  data: {
+		password: hashedPassword
+	  }
+	});
+	
+	return user;
+  }
+}
