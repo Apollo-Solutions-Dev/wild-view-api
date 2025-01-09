@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
 import {
-  S3Client,
   GetObjectCommand,
-  PutObjectCommand,
   ListObjectsV2Command,
+  PutObjectCommand,
+  S3Client,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class S3Service {
@@ -33,7 +33,7 @@ export class S3Service {
   async getVideoUploadUrl(fileName: string) {
     const command = new PutObjectCommand({
       Bucket: process.env.AWS_BUCKET_NAME,
-      Key: `v1.5/input/${fileName}`,
+      Key: `v1.5/input_videos/${fileName}`,
       ContentType: 'video/*',
     });
 

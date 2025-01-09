@@ -7,9 +7,9 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { S3Service } from './s3/s3.service';
-import { PrismaService } from './prisma/prisma.service';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { PrismaService } from './prisma/prisma.service';
+import { S3Service } from './s3/s3.service';
 
 @Controller('api')
 export class AppController {
@@ -25,8 +25,22 @@ export class AppController {
   }
 
   @Post('get-json-upload-url')
-  async getJsonUploadUrl(@Body() body: { fileName: string }) {
-    const uploadUrl = await this.s3Service.getJsonUploadUrl(body.fileName);
+  async getJsonUploadUrl(@Body() body: { 
+    data: { 
+      video: string, 
+      polygons: Array<Array<{x: number, y: number}>> 
+    },
+    fileName?: string 
+  }) {
+    if (!body.data?.polygons) {
+      throw new Error('Polygons data is required');
+    }
+    if (!body.data?.video) {
+      throw new Error('Video path is required');
+    }
+
+    const fileName = `v1.5/image_points/${body.data.video.split('/').pop()}.json`;
+    const uploadUrl = await this.s3Service.getJsonUploadUrl(fileName);
     return { uploadUrl };
   }
 
