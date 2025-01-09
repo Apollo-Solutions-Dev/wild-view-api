@@ -8,9 +8,8 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { S3Service } from './s3/s3.service';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { PrismaService } from './prisma/prisma.service';
-import * as bcrypt from 'bcrypt';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('api')
 export class AppController {
@@ -32,8 +31,41 @@ export class AppController {
   }
 
   @Post('get-video-upload-url')
-  async getVideoUploadUrl(@Body() body: { fileName: string }) {
-    const uploadUrl = await this.s3Service.getVideoUploadUrl(body.fileName);
-    return { uploadUrl };
+  @UseInterceptors(FileInterceptor('file'))
+  async getVideoUploadUrl(
+    @UploadedFile() file: any,
+    @Body('fileName') fileName: string,
+  ) {
+    try {
+      if (!fileName) {
+        throw new Error('Filename is required');
+      }
+
+      const uploadUrl = await this.s3Service.getVideoUploadUrl(fileName);
+
+      const urlResponse = await fetch(uploadUrl, {
+        method: 'PUT',
+        body: file.buffer,
+        headers: {
+          'Content-Type': 'video/mp4',
+        },
+      });
+
+      if (!urlResponse.ok) {
+        throw new Error('Failed to upload video');
+      }
+
+      return {
+        status: 'success',
+        message: 'Video uploaded successfully',
+        url: urlResponse.url,
+      };
+    } catch (error) {
+      return {
+        status: 'error',
+        message: error.message || 'Failed to upload video',
+        code: error.code,
+      };
+    }
   }
 }
