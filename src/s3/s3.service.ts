@@ -41,12 +41,19 @@ export class S3Service {
   }
 
   async listFiles(prefix: string) {
+    console.log('Searching with prefix:', prefix);
+    
+    const fullPrefix = prefix.startsWith('v1.5/') ? prefix : `v1.5/image_points/${prefix}`;
+    console.log('Full prefix:', fullPrefix);
+
     const command = new ListObjectsV2Command({
       Bucket: process.env.AWS_BUCKET_NAME,
-      Prefix: prefix,
+      Prefix: fullPrefix,
     });
 
     const response = await this.s3Client.send(command);
+    
+    console.log('S3 Response:', response);
 
     const files = await Promise.all(
       response.Contents?.map(async (file) => ({
@@ -68,5 +75,15 @@ export class S3Service {
     });
 
     return await getSignedUrl(this.s3Client, command, { expiresIn: 3600 });
+  }
+
+  async getFileContent(key: string): Promise<Buffer> {
+    const command = new GetObjectCommand({
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: key,
+    });
+    
+    const response = await this.s3Client.send(command);
+    return Buffer.from(await response.Body.transformToByteArray());
   }
 }
