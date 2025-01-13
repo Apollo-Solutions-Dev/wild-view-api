@@ -7,6 +7,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model FabricError {
+  id            Int      @id @default(autoincrement())
+  timestamp     DateTime
+  machine       String
+  errorClass    String
+  fullImageURL  String
+  shift         String
+  errorImageURL String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  obId          String
+
+  ob Ob? @relation(fields: [obId], references: [id])
+
+  @@index([obId])
+  @@index([id])
+}
 
 model User {
   id            Int            @id @default(autoincrement())
@@ -15,6 +32,7 @@ model User {
   password      String
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
+  obs           Ob[]
   refreshTokens RefreshToken[]
 }
 
@@ -29,59 +47,15 @@ model RefreshToken {
   @@index([userId])
 }
 
-model Team {
-  id        String      @id @default(uuid())
-  name      String
-  videoId   String      @map("video_id")
-  
-  video     Video       @relation(fields: [videoId], references: [id], onDelete: Cascade)
-  staffs    TeamStaff[]
-  
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  deletedAt DateTime?
-  
-  @@map("teams")
-}
+model Ob {
+  id           String        @id @unique
+  obPieces     Json          @default("[]")
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  fabricErrors FabricError[]
+  User         User?         @relation(fields: [userId], references: [id])
+  userId       Int?
 
-model Staff {
-  id        String      @id @default(uuid())
-  name      String
-  key       String      @unique
-  
-  teams     TeamStaff[]
-  
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  deletedAt DateTime?
-  
-  @@map("staffs")
-}
-
-model TeamStaff {
-  id        String      @id @default(uuid())
-  teamId    String      @map("team_id")
-  staffId   String      @map("staff_id")
-  
-  team      Team        @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  staff     Staff       @relation(fields: [staffId], references: [id], onDelete: Cascade)
-  
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  deletedAt DateTime?
-  
-  @@map("team_staffs")
-}
-
-model Video {
-  id        String      @id @default(uuid())
-  title     String
-  key       String      @unique
-  teams     Team[]
-  
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  deletedAt DateTime?
-  
-  @@map("videos")
+  @@index([userId])
+  @@index([id])
 }
