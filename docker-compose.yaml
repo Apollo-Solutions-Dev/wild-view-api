@@ -1,4 +1,18 @@
 services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgresql:5432/wildview
+    depends_on:
+      - postgresql
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+
   postgresql:
     image: bitnami/postgresql:16
     environment:

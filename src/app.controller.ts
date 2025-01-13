@@ -25,13 +25,16 @@ export class AppController {
   }
 
   @Post('get-json-upload-url')
-  async getJsonUploadUrl(@Body() body: { 
-    data: { 
-      video: string, 
-      polygons: Array<Array<{x: number, y: number}>> 
+  async getJsonUploadUrl(
+    @Body()
+    body: {
+      data: {
+        video: string;
+        polygons: Array<Array<{ x: number; y: number }>>;
+      };
+      fileName?: string;
     },
-    fileName?: string 
-  }) {
+  ) {
     if (!body.data?.polygons) {
       throw new Error('Polygons data is required');
     }
