@@ -24,19 +24,15 @@ export class TeamStaffsService {
     });
   }
 
-  async findOne(id: string) {
+  async findOne(relation_id: string) {
     return this.prisma.teamStaff.findUnique({
-      where: { id },
-      include: {
-        team: true,
-        staff: true,
-      },
+      where: { relation_id },
     });
   }
 
-  async remove(id: string) {
+  async remove(relation_id: string) {
     return this.prisma.teamStaff.delete({
-      where: { id },
+      where: { relation_id },
     });
   }
 }

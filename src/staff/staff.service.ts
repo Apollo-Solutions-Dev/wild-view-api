@@ -26,7 +26,7 @@ export class StaffService {
         imageUrl: true,
         teams: {
           select: {
-            id: true,
+            relation_id: true,
           },
         },
         createdAt: true,
